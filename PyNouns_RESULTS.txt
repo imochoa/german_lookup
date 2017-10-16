@@ -1,0 +1,48 @@
+Words	word_type
+Bestätigung	noun | verb
+Tanzen	noun | verb
+Abgase	noun
+Angebot	noun | adjadv | verb
+Abrechnung	noun | adjadv | verb
+Abschnitt	noun | verb
+Alter	noun | adjadv | verb
+Angebot	noun | adjadv | verb
+Anhang	noun
+Antrag	noun | adjadv | verb
+Arbeitswelt	noun
+Argument	noun | verb
+Aufforderung	noun
+Aufregung	noun | adjadv | verb
+Aufschrift	noun
+Augenblick	noun | adjadv | verb
+Ausnahme	noun | adjadv | verb
+Auszug	noun | verb
+Bedeutung	noun | adjadv | verb
+Befragung	noun
+Begriff	noun | adjadv | verb
+Benachrichtigung	noun | adjadv
+Bescheid	noun | verb
+Beschwerdebrief	noun
+Betreuung	noun
+Bewegung	noun | adjadv | verb
+Buchstabe	noun | adjadv
+Bundestagswahl	noun
+Chor	noun | adjadv | verb
+Diät	noun | adjadv | verb
+die Akte	noun | adjadv | verb
+Dieb	noun | verb
+Dienst	noun | adjadv | verb
+Dienstreise	noun | verb
+Druck	noun | adjadv | verb
+Dutzend	noun | adjadv
+DVD	noun
+Einfahrt	noun | verb
+Einschreibsendung	noun
+Entspannung	noun
+Ersatzgerät	
+Ersatzteil	noun
+Erziehung	noun | adjadv
+EU = Europäische Union	noun | adjadv
+Fachkraft	noun
+Fahrbahn	noun | adjadv
+Feierabend	noun | verb

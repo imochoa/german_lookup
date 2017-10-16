@@ -18,4 +18,4 @@ if __name__ == "__main__":
 
     # Relative paths as well?
     finder.lookup_txt_file(input_file_path='/home/ignacio/Code/ger_looker_upper/PyNouns.txt',
-                           default_attributes=['gender'])
+                           default_attributes=['word_type'])

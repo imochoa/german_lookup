@@ -1,3 +1,4 @@
+Bestätigung
 Tanzen
 Abgase
 Angebot
@@ -21,7 +22,6 @@ Begriff
 Benachrichtigung
 Bescheid
 Beschwerdebrief
-Bestätigung
 Betreuung
 Bewegung
 Buchstabe
