@@ -42,6 +42,8 @@ At this point the user can also specify the output file name using the `output_f
 will be in the same directory as the input file. The user can choose between having a CSV (Comma Separated Value) or a TSV (Tab Separated Value) output file by setting the `csv`
 input boolean; `csv=True` will make it CSV, and `csv=False` will make it TSV. The default is TSV
 
+MAKE SURE THE INPUT FILE IS SAVED IN UTF8 FORMAT
+
 The `lookup_txt_file()` method will try to find the attributes specified in the `default_attributes` input argument
 for all of the words in the input file. These default attributes are basically anything from the leo dictionary result page for a word.
 The values should be specified in a list and they will be written to the output file in the order they are specified here.
