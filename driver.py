@@ -3,16 +3,15 @@
 
 import codecs
 import os
+import re
 import time
+import traceback
 from bs4 import BeautifulSoup
 
-import traceback
+import core
 
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.wait import WebDriverWait
-
-import re
 
 possible_attributes = {
     'general':    ['word_type'],
@@ -27,7 +26,7 @@ class VocabFinder(object):
     # Class variables
     # Names used by leo_dict for the sections that correspond to each type
 
-    num_results = 3
+    num_results = 5
 
     def __init__(self,
                  webdriver,
@@ -66,6 +65,9 @@ class VocabFinder(object):
         search_box.send_keys(word + '\n')
         time.sleep(self.pause)
 
+    def close(self):
+        self.driver.quit()
+
     def _attribute_finder(self, attr_lst):
 
         if not isinstance(attr_lst, list):
@@ -84,141 +86,20 @@ class VocabFinder(object):
         # NOUNS
         if noun_sect is not None:
             results['word_type'] += ['noun']  # Add to that word's type
-
-            if any(a in possible_attributes['noun'] for a in attr_lst):
-                # Get the Noun info
-                noun_table = noun_sect.find('table')  # find table
-
-                r = []
-                d = dict()
-                it = 0
-
-                for row in noun_table.tbody.findAll('tr'):
-                    if it == self.num_results:
-                        break
-                    else:
-                        it += 1
-
-                    first_column = row.findAll('td')[4]
-                    third_column = row.findAll('td')[7]
-
-                    del d
-                    d = {
-                        'word':                    third_column.find('mark').text,
-                        'def':                     first_column.text,
-                        'gender': third_column.text[0:3],
-                        'plural':                  third_column.find('small').text
-                        }
-
-                    # Fixing plural format: 'Pl.: ' at the beginning
-                    if d['plural'].startswith('Pl.: '):
-                        d['plural'] = d['plural'][5:]
-
-                    r += [d]
-
-                # TODO Keep one row, except in the defs
-                # Parse noun GENDER
-                lst = [iter_d['gender'] for iter_d in r]
-                results['gender'] = max(set(lst), key=lst.count)
-
-                # Parse noun PLURAL
-                lst = [iter_d['plural'] for iter_d in r]
-                results['plural'] = max(set(lst), key=lst.count)
-
-                # Parse noun DEF
-                results['noun_def'] = u' | '.join([iter_d['def'] for iter_d in r])
+            results.update(core.noun_info_extractor(noun_sect, self.num_results))
 
         # ADJECTIVES & ADVERBS
-        # TODO Finish adjectives and adverbs
         if adjadv_sect is not None:
             results['word_type'] += ['adjadv']  # Add to that word's type
-
-            if any(a in possible_attributes['adjadv'] for a in attr_lst):
-                for row in noun_table.tbody.findAll('tr'):
-                    first_column = row.findAll('td')[4]
-                    third_column = row.findAll('td')[7]
-
-                    noun_def = first_column.text
-
-                    word_de = third_column.find('mark').text
-                    word_de_plural = third_column.find('small').text
-                    word_de_gender = third_column.text[0:3]
-
-                    print word_de_gender, word_de, word_de_plural, noun_def
+            results.update(core.adjadv_info_extractor(adjadv_sect, self.num_results))
 
         # VERBS
         # TODO Finish verbs
         if verb_sect is not None:
             results['word_type'] += ['verb']
+            results.update(core.verb_info_extractor(verb_sect, self.num_results))
 
-            if any(a in possible_attributes['verb'] for a in attr_lst):
-                # Get the Verb info
-                verb_table = verb_sect.find('table')  # find table
-
-                r = []
-                d = dict()
-                it = 0
-
-                for row in verb_table.tbody.findAll('tr'):
-                    if it == self.num_results:
-                        break
-                    else:
-                        it += 1
-
-                    first_column = row.findAll('td')[4]
-                    third_column = row.findAll('td')[7]
-
-                    del d
-
-                    de_word = third_column.text
-
-                    m = re.match(r'(\w*)[^\w]*(\w*)[^\w]*(\w*)[^\w]*', de_word)
-
-                    d = {
-                        'word':         third_column.find('mark').text,
-                        'def':          first_column.text,
-                        'inf':          m.group(1),
-                        'imperfekt_3s': m.group(2),
-                        'PII':          m.group(3)
-                        }
-
-                    # More verb tenses
-                    if it == 1 and any(
-                            a.startswith(v_e) for v_e in possible_attributes['verb_extra'] for a in attr_lst):
-                        # go into verb tenses
-                        verb_box = self.driver.find_element_by_xpath(
-                                '//*[@id="section-verb"]/table/tbody/tr[1]/td[6]/a/i')
-                        verb_box.click()
-                        time.sleep(self.pause)
-
-                        # Find all sections
-
-                        v_soup = BeautifulSoup(self.driver.page_source, "lxml")
-                        indikativ_sect = v_soup.find('div', id='mood-1')
-                        konjunktiv_sect = v_soup.find('div', id='mood-2')
-                        imperativ_sect = v_soup.find('div', id='mood-3')
-                        impersonal_sect = v_soup.find('div', id='mood-4')
-
-                        # Get info
-                        tenses = {
-                            'imperfekt_3s': '//*[@id="flect"]/div[2]/div/div[3]/table/tbody[2]/tr[4]/td[1]/span[2]',
-                            'KII_imp_3s':   '//*[@id="flect"]/div[2]/div/div[4]/table/tbody[2]/tr[4]/td[1]/span[2]'}
-
-                        tenses = {k: self.driver.find_element_by_xpath(v).text for k, v in tenses.iteritems()}
-
-                        # leave verb tenses
-                        verb_box = self.driver.find_element_by_xpath('/html/body/div[30]/div[1]/button/span[1]')
-                        verb_box.click()
-                        time.sleep(self.pause)
-
-                    r += [d]
-
-                # Parse verb results
-                lst = [iter_d['gender'] for iter_d in r]
-                results['gender'] = max(set(lst), key=lst.count)
-
-                # Parse verb DEF
-                results['verb_def'] = u' | '.join([iter_d['def'] for iter_d in r])
+            # results['verb_def'] = u' | '.join([iter_d['def'] for iter_d in r])
 
         # FINISHED
 
